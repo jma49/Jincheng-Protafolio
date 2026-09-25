@@ -63,7 +63,12 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   its proportions, and can set it as the desktop picture.
 - **Stickies:** a guestbook of notes in the style of Mac OS X Stickies,
   stored in Supabase. Notes show right away; each visitor gets one,
-  enforced by a salted hash of their IP address plus a browser flag.
+  enforced by a salted hash of their IP address (a unique index in the
+  database) plus a browser flag that turns the button into "Note Posted
+  ✓". People behind one shared address share a note; if the database
+  can't see an address, only the browser flag applies. Checked against
+  the live project: a second note from the same IP gets a 409 and a
+  friendly "You've already left a note".
 - **Dashboard:** clock, calendar, San Jose weather (Open-Meteo), recent
   GitHub activity and a sticky note.
 
@@ -99,10 +104,19 @@ an app is open.
   deploys. DNS is at GoDaddy.
 - Supabase project `hszogpoyyqgwjuznbegd` backs Stickies and presence.
   Vercel holds its URL and publishable key as `NEXT_PUBLIC_SUPABASE_URL`
-  and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (all environments). The
-  schema is `supabase/schema.sql`; later changes go in
-  `supabase/migrations/` and are run by hand in the SQL editor. Free
-  projects pause after a week without activity.
+  and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (all environments; Astro
+  exposes the `NEXT_PUBLIC_` prefix through `vite.envPrefix`). Preview
+  deployments use the same project as production, so anything posted
+  while testing a PR is real data.
+- The project has `supabase/schema.sql` and
+  `supabase/migrations/20260925_one_note_per_visitor.sql` applied.
+  `schema.sql` always describes the full current state for a new
+  project; changes to an existing one go in a new dated file under
+  `supabase/migrations/`, written so it can be rerun, and the owner runs
+  it by hand in the SQL editor. The editor warns about "destructive
+  operations" for `drop policy` / `drop trigger` lines; that's expected.
+- Free Supabase projects pause after a week without activity; Stickies
+  and presence then hide themselves until it's resumed.
 
 ### Code map
 - `src/os/store.ts`: window map + z-order array; theme, Spotlight,
@@ -131,6 +145,11 @@ ryOS (AGPL-3.0).
 - Conventional Commits, one logical change per commit.
 - Branch → PR → merge after CI passes. The owner sometimes merges PRs
   directly on GitHub, so fetch `main` before assuming a PR is still open.
+- Merge with merge commits. When PRs are stacked, merge from the bottom
+  up. Delete a branch once it's merged; only `main` should be left.
+- Try UI changes in a real browser before calling them done. The owner's
+  Chrome has reduced motion on, so animation work needs a temporary
+  bypass to see (and the reduced-motion fallback checked separately).
 
 ### Decisions
 - No link back to a classic site; Chinese is on hold.
@@ -146,16 +165,23 @@ The issues listed in the first handoff are resolved: `/zh/` paths with a
 trailing slash redirect, the Security Checkpoint no longer blocks
 non-browser requests, the canonical URL matches the `www` domain, Assay's
 links point at `assay-sql.vercel.app`, and the stray `majincheng` Vercel
-project is gone.
+project is gone. PRs #13–#17 are merged and every other branch is
+deleted.
 
-1. **Moderation, if Stickies attracts spam.** Options discussed: an email
+1. **Delete the test notes.** Two notes starting `[TEST]` and `[TEST 2]`
+   were left while checking Stickies. Visitors can't delete, so remove
+   them in Supabase → Table Editor → notes. `[TEST 2]` holds the owner's
+   IP slot until it's gone.
+2. **Moderation, if Stickies attracts spam.** Options discussed: an email
    (or Telegram) notification per note with signed approve/delete links
    via a Supabase Edge Function; an owner-only review app in JM/OS behind
    Supabase Auth; automatic filtering in front of either.
-2. **Photos freshness.** Without `UNSPLASH_ACCESS_KEY`, new Unsplash
+3. **Photos freshness.** Without `UNSPLASH_ACCESS_KEY`, new Unsplash
    uploads reach the site only when the weekly workflow refreshes the
    snapshot, and only if GitHub's runners aren't blocked too.
-3. **Possible next work:** phone polish; persisting windows across
+4. **Branch hygiene.** Turning on "Automatically delete head branches"
+   in the GitHub repo settings would make the cleanup above automatic.
+5. **Possible next work:** phone polish; persisting windows across
    reloads; automated tests for the window manager; the Chinese site and
    the AI assistant later; an ocra review-replay app once ocra's redesign
    is done.
