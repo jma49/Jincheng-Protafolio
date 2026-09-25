@@ -144,6 +144,79 @@
   filter: brightness(0.6);
 }
 
+/* ---------- Sky (San Jose light and weather over the wallpaper) ---------- */
+
+.os-sky {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.os-sky > * {
+  position: absolute;
+  inset: 0;
+}
+
+.os-sky-tint {
+  mix-blend-mode: multiply;
+  transition: background-color 60s linear;
+}
+
+.os-sky-gloom {
+  background: linear-gradient(rgba(70, 78, 92, 0.9), rgba(110, 116, 126, 0.6));
+  mix-blend-mode: multiply;
+  transition: opacity 3s ease;
+}
+
+.os-sky-fog {
+  inset: -10% -30%;
+  background:
+    radial-gradient(ellipse 40% 30% at 30% 60%, rgba(235, 238, 242, 0.55), transparent 70%),
+    radial-gradient(ellipse 45% 35% at 75% 40%, rgba(235, 238, 242, 0.45), transparent 70%),
+    linear-gradient(transparent, rgba(225, 228, 232, 0.4));
+  animation: os-fog-drift 60s ease-in-out infinite alternate;
+}
+
+@keyframes os-fog-drift {
+  to {
+    transform: translateX(12%);
+  }
+}
+
+.os-sky-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.os-sky-flash {
+  background: rgba(235, 240, 255, 0.9);
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  animation: os-lightning 0.9s ease-out;
+}
+
+@keyframes os-lightning {
+  0%, 100% { opacity: 0; }
+  6% { opacity: 1; }
+  14% { opacity: 0.2; }
+  22% { opacity: 0.8; }
+}
+
+.os-status .os-sky-status {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 100%;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.os-status .os-sky-status span {
+  font-size: 11px;
+}
+
 /* ---------- Menu bar ---------- */
 
 .os-menubar {
@@ -333,6 +406,13 @@
   overflow: hidden;
   transform-origin: center;
   will-change: transform;
+}
+
+/* Holds a window's Genie filter; takes no space. */
+.os-genie-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
 }
 
 .os-window[data-focused='true'] {
@@ -1784,6 +1864,107 @@
   line-height: 1.45;
   box-shadow: inset 0 -12px 20px -16px rgba(120, 90, 0, 0.5);
   rotate: 2deg;
+}
+
+/* ---------- Desktop context menu ---------- */
+
+.os-context-menu {
+  position: fixed;
+  z-index: 1100;
+  border-radius: 5px;
+}
+
+/* ---------- Exposé ---------- */
+
+/* Sits under the windows (z-index 10 and up) and over the desktop icons. */
+.os-expose {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.os-expose-label {
+  position: absolute;
+  max-width: 260px;
+  padding: 2px 10px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.os-window[data-exposed] {
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* The whole window is one click target: pick it and leave Exposé. */
+.os-window[data-exposed] > * {
+  pointer-events: none;
+}
+
+.os-window[data-exposed]:hover {
+  box-shadow: 0 0 0 6px rgba(120, 170, 255, 0.85), 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- Screensaver ---------- */
+
+.os-screensaver {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  overflow: hidden;
+  background: #000;
+  cursor: none;
+}
+
+.os-screensaver-slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.os-screensaver-backdrop {
+  position: absolute;
+  inset: -60px;
+  background: center / cover no-repeat;
+  filter: blur(48px) brightness(0.55) saturate(1.2);
+}
+
+.os-screensaver-slide img {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.os-screensaver-caption {
+  position: absolute;
+  left: 40px;
+  bottom: 34px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+.os-screensaver-caption strong {
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 /* ---------- Small screens: an iOS-style home screen ---------- */

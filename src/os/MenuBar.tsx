@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { apps, launch } from './registry';
 import { useFocusedId, useWindows } from './store';
 import { useOSData } from './context';
+import { SkyStatus, type SkyState } from './Sky';
 
 interface MenuItem {
   label: string;
@@ -20,7 +21,7 @@ function useClock() {
   return now;
 }
 
-export function MenuBar() {
+export function MenuBar({ sky }: { sky: SkyState }) {
   const data = useOSData();
   const focusedId = useFocusedId();
   const windows = useWindows((s) => s.windows);
@@ -60,7 +61,10 @@ export function MenuBar() {
       { label: 'Close Window', shortcut: '⌥W', disabled: !focused, action: () => focused && close(focused.id) }
     ],
     View: [
+      { label: 'Exposé', shortcut: 'F9', disabled: !focused, action: () => useWindows.getState().setExpose(true) },
       { label: 'Show Dashboard', action: () => useWindows.getState().setDashboard(true) },
+      { label: 'Start Screen Saver', disabled: data.photos.length === 0, action: () => useWindows.getState().setScreensaver(true) },
+      { divider: true, label: '' },
       { label: theme === 'dark' ? 'Light Appearance' : 'Dark Appearance', action: () => setTheme(theme === 'dark' ? 'light' : 'dark') }
     ],
     Window: [
@@ -125,6 +129,7 @@ export function MenuBar() {
       </nav>
 
       <div className="os-status">
+        <SkyStatus sky={sky} onOpen={() => useWindows.getState().setDashboard(true)} />
         <button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Toggle appearance">
           {theme === 'dark' ? '☀︎' : '☾'}
         </button>
