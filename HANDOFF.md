@@ -12,7 +12,7 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   `src/content/projects/zh/` are kept for later.
 - **Project pages** at `/projects/<slug>/` remain for search and sharing,
   with an "Open in JM/OS" link.
-- **Deep links:** `/?open=<about|resume|projects|photos|stickies|soapbox|terminal|preferences|<project-slug>|dashboard|screensaver>`.
+- **Deep links:** `/?open=<about|resume|projects|photos|ipod|karaoke|stickies|soapbox|terminal|preferences|<project-slug>|dashboard|screensaver>`.
   `?sky=<dawn|day|golden|dusk|night>,<clear|cloudy|overcast|fog|drizzle|rain|storm|snow>`
   pins the desktop's time of day and weather for demos; `?place=<city>`
   pins the visitor's place.
@@ -23,12 +23,18 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   JSON-LD are generated.
 
 ### Shell
-- Menu bar with per-app menus and a clock.
+- Menu bar with per-app menus and a clock. It's see-through over the
+  desktop picture, with white or black text to suit the picture, and
+  opaque over a zoomed window or an app on a phone. The Apple logo takes
+  the accent colour, so it follows the desktop picture.
 - Desktop icons: Macintosh HD, About Me, Résumé, Projects, Photos,
   Stickies, Terminal. Right-clicking the empty desktop offers to change
   or reset the desktop picture, Exposé and the screensaver.
-- Dock with magnification, running triangles, a Dashboard toggle and a
-  trash can.
+- Dock: one floating, rounded pane of frosted glass with magnification,
+  running dots, a Dashboard toggle and a trash can.
+- The desktop picture changes (within its collection) each time the
+  visitor leaves the tab and comes back; System Preferences can turn it
+  off.
 - Window manager: drag, resize from five edges, z-order, minimize into
   the Dock with a Genie effect (SVG displacement map; Safari, phones and
   reduced motion get a plain shrink), zoom, windows that grow from the
@@ -96,6 +102,15 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   bot (`supabase/functions/soapbox-bot`); visitors react with one emoji
   per post, and the newest one shows on the Dashboard. Terminal:
   `soapbox`, `weather [city]`.
+- **iPod:** a fifth-generation iPod with a working click wheel (drag,
+  scroll or arrow keys), Songs / Artists / Shuffle / Settings menus and
+  Now Playing with the YouTube video in the screen and a line of lyrics.
+- **Karaoke:** the song's video fills the window and its lyrics fill in
+  time, line by line, with a song picker, seeking and a per-song lyrics
+  timing nudge. Shares the iPod's library and "now playing": whichever
+  app was used last plays, and the other picks up at the same second.
+  Songs are YouTube ids in `src/data/songs.json` (15 to start with);
+  lyrics are fetched from lrclib.net in the browser.
 - **Finder:** Macintosh HD opens a Finder over Applications, Applets,
   Documents, Pictures and Projects, with icon and list views.
 - **Applet Store:** Get / Open / Remove for the applets, which install
@@ -221,16 +236,22 @@ deleted.
    snapshot, and only if GitHub's runners aren't blocked too.
 4. **Branch hygiene.** Turning on "Automatically delete head branches"
    in the GitHub repo settings would make the cleanup above automatic.
-5. **Possible next work:** phone polish; persisting windows across
+5. **Songs.** The starting list in `src/data/songs.json` was chosen for
+   having synced lyrics on lrclib and embeddable videos; replace it with
+   Jincheng's own picks. Lyrics timing (`offset`) was carried over from
+   ryOS's values for the same videos and wants checking by ear in Karaoke.
+   Chrome defers YouTube playback in background tabs, so a song started in
+   a hidden tab waits until the tab is shown. The Dock now has 12 apps
+   plus Dashboard; consider trimming it.
+6. **Possible next work:** phone polish; persisting windows across
    reloads; automated tests for the window manager; the Chinese site and
    the AI assistant later; an ocra review-replay app once ocra's redesign
    is done.
-6. **Visual parity with ryOS** is largely done (see Look above). Left
+7. **Visual parity with ryOS** is largely done (see Look above). Left
    on purpose: multiple OS themes (System 7, XP, 98), video wallpapers.
-7. **Still missing compared with ryOS:** Soapbox photos (Telegram
+8. **Still missing compared with ryOS:** Soapbox photos (Telegram
    images into Supabase Storage); a Finder-style file browser over the
    projects; more Dashboard widgets (e.g. a world clock of where
-   visitors are). Deliberately skipped: ryOS's media apps (iPod, Videos,
-   Karaoke), emulators, a virtual file system, multiple themes and AI
+   visitors are). Deliberately skipped: ryOS's Videos app, emulators, a virtual file system, multiple themes and AI
    chat. Listen to the sounds once (#24); they were checked by
    instrumentation, not by ear.
