@@ -12,7 +12,11 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   `src/content/projects/zh/` are kept for later.
 - **Project pages** at `/projects/<slug>/` remain for search and sharing,
   with an "Open in JM/OS" link.
-- **Deep links:** `/?open=<about|resume|projects|photos|terminal|<project-slug>|dashboard>`.
+- **Deep links:** `/?open=<about|resume|projects|photos|stickies|terminal|<project-slug>|dashboard|screensaver>`.
+  `?sky=<dawn|day|golden|dusk|night>,<clear|cloudy|overcast|fog|drizzle|rain|storm|snow>`
+  pins the desktop's time of day and weather for demos.
+- **Canonical URL** is `https://www.majincheng.com`; the bare domain
+  redirects to it.
 - **SEO and accessibility:** the home page ships a visually hidden
   plain-text copy of the content; sitemap, `robots.txt`, `llms.txt` and
   JSON-LD are generated.
@@ -20,11 +24,23 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
 ### Shell
 - Menu bar with per-app menus and a clock.
 - Desktop icons: Macintosh HD, About Me, Résumé, Projects, Photos,
-  Terminal.
+  Stickies, Terminal. Right-clicking the empty desktop offers to change
+  or reset the desktop picture, Exposé and the screensaver.
 - Dock with magnification, running triangles, a Dashboard toggle and a
   trash can.
 - Window manager: drag, resize from five edges, z-order, minimize into
-  the Dock, zoom, and windows that grow from the icon that opened them.
+  the Dock with a Genie effect (SVG displacement map; Safari, phones and
+  reduced motion get a plain shrink), zoom, windows that grow from the
+  icon that opened them, and windows that can be thrown and bounce off
+  the screen edges.
+- Exposé: F9, the bottom-left hot corner or View → Exposé.
+- Screensaver: a Ken Burns slideshow of the Photos library after two
+  idle minutes.
+- Sky: the wallpaper follows the light and weather in San Jose
+  (Open-Meteo), with rain, storms, snow and fog drawn behind the windows
+  and the temperature in the menu bar.
+- Presence: the menu bar counts who's on the desktop, and other
+  visitors' cursors drift across it.
 - Spotlight (⌘K); ⌥W / ⌥M / ⌥T close, minimize and open a terminal
   (browsers reserve ⌘W and ⌘T).
 - Boot screen once per session; light and dark appearance.
@@ -39,10 +55,15 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
 - **Browser:** an iframe window for live demos.
 - **Terminal:** `help`, `whoami`, `ls`, `open`, `projects`, `contact`,
   `theme`, `neofetch`, tab completion and history.
-- **Photos:** the 43 Unsplash photos, fetched at build time from
-  Unsplash's public profile endpoint, grouped by year in justified rows.
-  The viewer shows the whole photo and resizes the window to its
-  proportions.
+- **Photos:** the 43 Unsplash photos, grouped by year in justified rows.
+  Fetched at build time; Unsplash blocks Vercel's build servers, so
+  builds usually fall back to the committed snapshot in
+  `src/data/photos.json` (set `UNSPLASH_ACCESS_KEY` to use the official
+  API instead). The viewer shows the whole photo, resizes the window to
+  its proportions, and can set it as the desktop picture.
+- **Stickies:** a guestbook of notes in the style of Mac OS X Stickies,
+  stored in Supabase. Notes show right away; each visitor gets one,
+  enforced by a salted hash of their IP address plus a browser flag.
 - **Dashboard:** clock, calendar, San Jose weather (Open-Meteo), recent
   GitHub activity and a sticky note.
 
@@ -66,7 +87,8 @@ an app is open.
   answer with an HTTP error, and only overwrite images whose pixels
   change by more than 0.1%.
 - The "Update project previews" workflow runs the script on macOS after
-  every push to `main` and commits changed images.
+  every push to `main` and weekly, and commits changed images. It also
+  runs `npm run photos:update` to refresh the Photos snapshot.
 
 ## 2. Architecture, stack and agreements
 
@@ -75,10 +97,18 @@ an app is open.
   with zustand for state and motion for animation.
 - Hosted on Vercel project `jincheng-protafolio`; merging to `main`
   deploys. DNS is at GoDaddy.
+- Supabase project `hszogpoyyqgwjuznbegd` backs Stickies and presence.
+  Vercel holds its URL and publishable key as `NEXT_PUBLIC_SUPABASE_URL`
+  and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (all environments). The
+  schema is `supabase/schema.sql`; later changes go in
+  `supabase/migrations/` and are run by hand in the SQL editor. Free
+  projects pause after a week without activity.
 
 ### Code map
-- `src/os/store.ts`: window map + z-order array; theme, Spotlight and
-  Dashboard state.
+- `src/os/store.ts`: window map + z-order array; theme, Spotlight,
+  Dashboard, Exposé, screensaver, desktop picture and online count.
+- `src/os/Expose.tsx`, `Screensaver.tsx`, `Sky.tsx` + `weather.ts`,
+  `genie.ts`, `Presence.tsx` + `social.ts`: the features above.
 - `src/os/registry.tsx`: every app, lazily loaded; `dockApps` and
   `mobileDockApps` choose what the Dock shows.
 - `src/os/apps/*`: one component per app.
@@ -106,30 +136,26 @@ ryOS (AGPL-3.0).
 - No link back to a classic site; Chinese is on hold.
 - Don't change ocra for now; it will be redesigned.
 - The "Ask me" AI assistant is on hold.
+- Stickies has no review step and no login, by choice; one note per
+  visitor is the only rule. To hide a note, set `approved` to false in
+  the Supabase Table editor.
 
 ## 3. Open issues and next steps
 
-1. **`/zh/` returns 404 instead of redirecting.** `vercel.json` defines
-   308 redirects for `/zh`, `/zh/:path*` and `/os`, but
-   `https://www.majincheng.com/zh/` returns 404 NOT_FOUND. Check whether
-   Vercel picks up `vercel.json` for this project and whether the rules
-   match the trailing-slash form. Verify `/os` at the same time.
-2. **Non-browser requests hit a Vercel Security Checkpoint.** `curl`
-   against any path gets 403 "Vercel Security Checkpoint". This can block
-   link-preview fetchers (LinkedIn, Slack), search engines and `llms.txt`
-   readers. Check the project's Firewall settings (Attack Challenge Mode
-   or bot protection).
-3. **Primary domain direction.** `majincheng.com` currently redirects to
-   `www`, while the code's canonical URL is the bare domain. Flip it in
-   Vercel → Domains, and update the GoDaddy records to the values Vercel
-   recommends.
-4. **Assay is down.** `sql-script-depoly.vercel.app` returns 404
-   `DEPLOYMENT_NOT_FOUND` and needs fixing in Vercel. Until then the
-   capture workflow skips it and keeps the last good cover, but the card's
-   demo link leads to a 404.
-5. **Cleanup.** Confirm the stray Vercel project `majincheng` has been
-   deleted.
-6. **Possible next work:** phone polish; persisting windows across
+The issues listed in the first handoff are resolved: `/zh/` paths with a
+trailing slash redirect, the Security Checkpoint no longer blocks
+non-browser requests, the canonical URL matches the `www` domain, Assay's
+links point at `assay-sql.vercel.app`, and the stray `majincheng` Vercel
+project is gone.
+
+1. **Moderation, if Stickies attracts spam.** Options discussed: an email
+   (or Telegram) notification per note with signed approve/delete links
+   via a Supabase Edge Function; an owner-only review app in JM/OS behind
+   Supabase Auth; automatic filtering in front of either.
+2. **Photos freshness.** Without `UNSPLASH_ACCESS_KEY`, new Unsplash
+   uploads reach the site only when the weekly workflow refreshes the
+   snapshot, and only if GitHub's runners aren't blocked too.
+3. **Possible next work:** phone polish; persisting windows across
    reloads; automated tests for the window manager; the Chinese site and
    the AI assistant later; an ocra review-replay app once ocra's redesign
    is done.
