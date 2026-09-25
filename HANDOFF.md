@@ -88,8 +88,13 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   bot (`supabase/functions/soapbox-bot`); visitors react with one emoji
   per post, and the newest one shows on the Dashboard. Terminal:
   `soapbox`, `weather [city]`.
-- **Minesweeper:** three levels, safe first click, flags, chording and
-  best times (desktop and Spotlight, not the Dock).
+- **Finder:** Macintosh HD opens a Finder over Applications, Applets,
+  Documents, Pictures and Projects, with icon and list views.
+- **Applet Store:** Get / Open / Remove for the applets, which install
+  into Finder's Applets folder and Spotlight: **Minesweeper** (installed
+  by default), **Tile Game** (a 4 × 4 sliding puzzle cut from a random
+  photo) and **Calculator**. The store and Tile Game icons are drawn in
+  SVG in `icons.tsx`.
 
 ### Phones
 iOS-style home screen: a four-column icon grid and a four-slot Dock.
