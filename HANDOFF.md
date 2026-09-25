@@ -12,9 +12,10 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   `src/content/projects/zh/` are kept for later.
 - **Project pages** at `/projects/<slug>/` remain for search and sharing,
   with an "Open in JM/OS" link.
-- **Deep links:** `/?open=<about|resume|projects|photos|stickies|terminal|<project-slug>|dashboard|screensaver>`.
+- **Deep links:** `/?open=<about|resume|projects|photos|stickies|soapbox|terminal|preferences|<project-slug>|dashboard|screensaver>`.
   `?sky=<dawn|day|golden|dusk|night>,<clear|cloudy|overcast|fog|drizzle|rain|storm|snow>`
-  pins the desktop's time of day and weather for demos.
+  pins the desktop's time of day and weather for demos; `?place=<city>`
+  pins the visitor's place.
 - **Canonical URL** is `https://www.majincheng.com`; the bare domain
   redirects to it.
 - **SEO and accessibility:** the home page ships a visually hidden
@@ -34,13 +35,17 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   icon that opened them, and windows that can be thrown and bounce off
   the screen edges.
 - Exposé: F9, the bottom-left hot corner or View → Exposé.
-- Screensaver: a Ken Burns slideshow of the Photos library after two
-  idle minutes.
-- Sky: the wallpaper follows the light and weather in San Jose
+- Screensavers: Photos (Ken Burns), Starfield or Clock, after the idle
+  time set in System Preferences (two minutes by default).
+- Place: the visitor's city, coordinates and time zone come from their
+  IP address through `api/geo.ts` (Vercel's `x-vercel-ip-*` headers; no
+  prompt, nothing stored). They can pick another city instead.
+- Sky: the wallpaper follows the light and weather at that place
   (Open-Meteo), with rain, storms, snow and fog drawn behind the windows
-  and the temperature in the menu bar.
-- Presence: the menu bar counts who's on the desktop, and other
-  visitors' cursors drift across it.
+  and the temperature (°F or °C by country) in the menu bar. The menu
+  bar clock uses the place's time zone; its tooltip shows San Jose time.
+- Presence: the menu bar counts who's on the desktop and lists where
+  they are ("🇯🇵 Tokyo"); other visitors' cursors carry the same label.
 - Spotlight (⌘K); ⌥W / ⌥M / ⌥T close, minimize and open a terminal
   (browsers reserve ⌘W and ⌘T).
 - Boot screen once per session; light and dark appearance.
@@ -69,8 +74,15 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   can't see an address, only the browser flag applies. Checked against
   the live project: a second note from the same IP gets a 409 and a
   friendly "You've already left a note".
-- **Dashboard:** clock, calendar, San Jose weather (Open-Meteo), recent
-  GitHub activity and a sticky note.
+- **Dashboard:** the visitor's clock (dark at night), calendar and
+  weather with a five-day forecast (flip it with "i" to pick a city);
+  "Jincheng's time" in San Jose with the offset and a guess at what
+  Jincheng is doing; recent GitHub activity and a sticky note.
+- **System Preferences:** Desktop & Screen Saver, Appearance (Automatic,
+  Light, Dark, Follow the sun) and Date, Time & Place.
+- **Soapbox:** Jincheng's own notes and rants, posted from a Telegram
+  bot (`supabase/functions/soapbox-bot`); visitors react with one emoji
+  per post. Terminal: `soapbox`, `weather [city]`.
 
 ### Phones
 iOS-style home screen: a four-column icon grid and a four-slot Dock.
@@ -161,6 +173,13 @@ ryOS (AGPL-3.0).
 
 ## 3. Open issues and next steps
 
+0. **Merge the 2026-09-25 stack, bottom up:** #19 (visitor location) →
+   #20 (visitor cities in presence) → #21 (System Preferences) → #22
+   (Soapbox). Then **set Soapbox up**: follow
+   `supabase/functions/soapbox-bot/README.md` (migration, @BotFather,
+   secrets, deploy with `--no-verify-jwt`, `setWebhook`). Until then the
+   app is empty.
+
 The issues listed in the first handoff are resolved: `/zh/` paths with a
 trailing slash redirect, the Security Checkpoint no longer blocks
 non-browser requests, the canonical URL matches the `www` domain, Assay's
@@ -185,3 +204,9 @@ deleted.
    reloads; automated tests for the window manager; the Chinese site and
    the AI assistant later; an ocra review-replay app once ocra's redesign
    is done.
+6. **Still missing compared with ryOS** (worth it for a portfolio, in
+   rough order): UI sounds (synthesize with Web Audio rather than copy
+   Apple's); an ⌥Tab app switcher; Minesweeper or another small game;
+   dragging desktop icons; a Dashboard "latest from Soapbox" widget and
+   Soapbox photos. Deliberately skipped: ryOS's media apps (iPod, Videos,
+   Karaoke), emulators, file system, multiple themes and AI chat.
