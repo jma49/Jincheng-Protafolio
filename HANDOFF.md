@@ -47,7 +47,11 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
 - Presence: the menu bar counts who's on the desktop and lists where
   they are ("🇯🇵 Tokyo"); other visitors' cursors carry the same label.
 - Spotlight (⌘K); ⌥W / ⌥M / ⌥T close, minimize and open a terminal
-  (browsers reserve ⌘W and ⌘T).
+  (browsers reserve ⌘W and ⌘T); ⌥Tab switches windows.
+- Sounds: synthesized with Web Audio, off by default; the menu bar
+  speaker or the Sound pane turns them on.
+- Desktop icons can be dragged anywhere; "Clean Up Icons" on the desktop
+  menu puts them back.
 - Boot screen once per session; light and dark appearance.
 
 ### Apps
@@ -82,7 +86,10 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   Light, Dark, Follow the sun) and Date, Time & Place.
 - **Soapbox:** Jincheng's own notes and rants, posted from a Telegram
   bot (`supabase/functions/soapbox-bot`); visitors react with one emoji
-  per post. Terminal: `soapbox`, `weather [city]`.
+  per post, and the newest one shows on the Dashboard. Terminal:
+  `soapbox`, `weather [city]`.
+- **Minesweeper:** three levels, safe first click, flags, chording and
+  best times (desktop and Spotlight, not the Dock).
 
 ### Phones
 iOS-style home screen: a four-column icon grid and a four-slot Dock.
@@ -175,7 +182,8 @@ ryOS (AGPL-3.0).
 
 0. **Merge the 2026-09-25 stack, bottom up:** #19 (visitor location) →
    #20 (visitor cities in presence) → #21 (System Preferences) → #22
-   (Soapbox). Then **set Soapbox up**: follow
+   (Soapbox) → #23 (⌥Tab) → #24 (sounds) → #25 (Soapbox on the
+   Dashboard) → #26 (draggable icons) → #27 (Minesweeper). Then **set Soapbox up**: follow
    `supabase/functions/soapbox-bot/README.md` (migration, @BotFather,
    secrets, deploy with `--no-verify-jwt`, `setWebhook`). Until then the
    app is empty.
@@ -204,9 +212,10 @@ deleted.
    reloads; automated tests for the window manager; the Chinese site and
    the AI assistant later; an ocra review-replay app once ocra's redesign
    is done.
-6. **Still missing compared with ryOS** (worth it for a portfolio, in
-   rough order): UI sounds (synthesize with Web Audio rather than copy
-   Apple's); an ⌥Tab app switcher; Minesweeper or another small game;
-   dragging desktop icons; a Dashboard "latest from Soapbox" widget and
-   Soapbox photos. Deliberately skipped: ryOS's media apps (iPod, Videos,
-   Karaoke), emulators, file system, multiple themes and AI chat.
+6. **Still missing compared with ryOS:** Soapbox photos (Telegram
+   images into Supabase Storage); a Finder-style file browser over the
+   projects; more Dashboard widgets (e.g. a world clock of where
+   visitors are). Deliberately skipped: ryOS's media apps (iPod, Videos,
+   Karaoke), emulators, a virtual file system, multiple themes and AI
+   chat. Listen to the sounds once (#24); they were checked by
+   instrumentation, not by ear.
