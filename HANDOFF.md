@@ -31,10 +31,16 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   Stickies, Terminal. Right-clicking the empty desktop offers to change
   or reset the desktop picture, Exposé and the screensaver.
 - Dock: one floating, rounded pane of frosted glass with magnification,
-  running dots, a Dashboard toggle and a trash can.
+  running dots, a Dashboard toggle and a trash can. It keeps Projects,
+  Photos, iPod, Stickies, Soapbox, Terminal and System Preferences; other
+  apps show up there while they're open.
+- Now playing: ♫ in the menu bar while a song is on, with a card (cover,
+  ⏮ ⏯ ⏭); the browser's media keys work through the Media Session API.
+  One sound switch (menu bar speaker, System Preferences › Sound)
+  governs interface sounds and music alike; pressing Play turns it on.
 - The desktop picture changes (within its collection) each time the
   visitor leaves the tab and comes back; System Preferences can turn it
-  off.
+  off. Dynamic › Now Playing shows the playing song's cover, blurred.
 - Window manager: drag, resize from five edges, z-order, minimize into
   the Dock with a Genie effect (SVG displacement map; Safari, phones and
   reduced motion get a plain shrink), zoom, windows that grow from the
@@ -103,14 +109,17 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   per post, and the newest one shows on the Dashboard. Terminal:
   `soapbox`, `weather [city]`.
 - **iPod:** a fifth-generation iPod with a working click wheel (drag,
-  scroll or arrow keys), Songs / Artists / Shuffle / Settings menus and
+  scroll or arrow keys), Albums / Artists / Songs / Shuffle / Settings
+  menus, album pages (cover, year, numbered tracks, Play, Shuffle) and
   Now Playing with the YouTube video in the screen and a line of lyrics.
 - **Karaoke:** the song's video fills the window and its lyrics fill in
   time, line by line, with a song picker, seeking and a per-song lyrics
   timing nudge. Shares the iPod's library and "now playing": whichever
   app was used last plays, and the other picks up at the same second.
-  Songs are YouTube ids in `src/data/songs.json` (15 to start with);
-  lyrics are fetched from lrclib.net in the browser.
+  Instrumentals get a listening view (cover over its own blur, album,
+  what's next). The library (`src/data/songs.json`) has 15 songs and
+  Ryuichi Sakamoto's BTTB -20th Anniversary Edition- (18 tracks);
+  lyrics come from lrclib.net, or NetEase via `/api/lyrics`.
 - **Finder:** Macintosh HD opens a Finder over Applications, Applets,
   Documents, Pictures and Projects, with icon and list views.
 - **Applet Store:** Get / Open / Remove for the applets, which install
@@ -236,13 +245,14 @@ deleted.
    snapshot, and only if GitHub's runners aren't blocked too.
 4. **Branch hygiene.** Turning on "Automatically delete head branches"
    in the GitHub repo settings would make the cleanup above automatic.
-5. **Songs.** The starting list in `src/data/songs.json` was chosen for
-   having synced lyrics on lrclib and embeddable videos; replace it with
-   Jincheng's own picks. Lyrics timing (`offset`) was carried over from
-   ryOS's values for the same videos and wants checking by ear in Karaoke.
-   Chrome defers YouTube playback in background tabs, so a song started in
-   a hidden tab waits until the tab is shown. The Dock now has 12 apps
-   plus Dashboard; consider trimming it.
+5. **Songs.** Ten of the starter songs remain (timing carried over from
+   ryOS's values, unchecked by ear), plus 寧夏, Kiss & Tell, 寫信給你,
+   心動 and 三個人的晚餐 (lyrics from NetEase) and BTTB. 三個人的晚餐
+   uses the official MV, which is ten seconds shorter than the album cut,
+   so its timing may need an `offset`. Chrome defers YouTube playback in
+   background tabs, so a song started in a hidden tab waits until the tab
+   is shown. `/api/lyrics` only runs on Vercel; under `astro dev` those
+   songs show the listening view.
 6. **Possible next work:** phone polish; persisting windows across
    reloads; automated tests for the window manager; the Chinese site and
    the AI assistant later; an ocra review-replay app once ocra's redesign
