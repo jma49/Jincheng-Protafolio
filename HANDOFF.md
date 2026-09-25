@@ -53,6 +53,14 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
 - Desktop icons can be dragged anywhere; "Clean Up Icons" on the desktop
   menu puts them back.
 - Boot screen once per session; light and dark appearance.
+- Look (2026-09-25 polish round, PRs #31–#39): Aqua pinstripes on
+  windows, menus and bars; brushed metal for Finder, Browser, Photos and
+  Calculator; an accent colour sampled from the desktop picture (or a
+  fixed one); background windows go grey; glossy Aqua buttons, pop-ups,
+  checkboxes, radios and sliders; an optional Glass material; Tiger
+  drawers (Photos Info, Finder Get Info); six screen savers (Photos,
+  Flurry, Soapbox, Starfield, Clock, Bounce); desktop pictures in
+  collections, including solid colours, patterns and a dynamic sky.
 
 ### Apps
 - **About:** short and long bio.
@@ -217,7 +225,9 @@ deleted.
    reloads; automated tests for the window manager; the Chinese site and
    the AI assistant later; an ocra review-replay app once ocra's redesign
    is done.
-6. **Still missing compared with ryOS:** Soapbox photos (Telegram
+6. **Visual parity with ryOS** is largely done (see Look above). Left
+   on purpose: multiple OS themes (System 7, XP, 98), video wallpapers.
+7. **Still missing compared with ryOS:** Soapbox photos (Telegram
    images into Supabase Storage); a Finder-style file browser over the
    projects; more Dashboard widgets (e.g. a world clock of where
    visitors are). Deliberately skipped: ryOS's media apps (iPod, Videos,
