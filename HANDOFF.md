@@ -65,6 +65,7 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
 - Desktop icons can be dragged anywhere; "Clean Up Icons" on the desktop
   menu puts them back.
 - Boot screen once per session; light and dark appearance.
+- Desktop pictures include ryOS's photo collections and tiles.
 - Look (2026-09-25 polish round, PRs #31–#39): Aqua pinstripes on
   windows, menus and bars; brushed metal for Finder, Browser, Photos and
   Calculator; an accent colour sampled from the desktop picture (or a
@@ -109,9 +110,13 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   per post, and the newest one shows on the Dashboard. Terminal:
   `soapbox`, `weather [city]`.
 - **iPod:** a fifth-generation iPod with a working click wheel (drag,
-  scroll or arrow keys), Albums / Artists / Songs / Shuffle / Settings
-  menus, album pages (cover, year, numbered tracks, Play, Shuffle) and
-  Now Playing with the YouTube video in the screen and a line of lyrics.
+  scroll or arrow keys): Music (Cover Flow, Albums, Artists, Songs),
+  Extras (Karaoke, Brick, Music Quiz), Settings (shuffle, repeat,
+  artwork or video on Now Playing, backlight, white / black / U2 theme),
+  album pages, a dimming backlight, scrolling titles and a scrollbar.
+  YouTube's title bar, logo and pause screen never show (cropped, and
+  covered with the artwork until the video plays). A Controls menu
+  appears in the menu bar while the iPod or Karaoke is in front.
 - **Karaoke:** the song's video fills the window and its lyrics fill in
   time, line by line, with a song picker, seeking and a per-song lyrics
   timing nudge. Shares the iPod's library and "now playing": whichever
