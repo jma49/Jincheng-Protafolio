@@ -218,7 +218,8 @@ an app is open.
   deployments use the same project as production, so anything posted
   while testing a PR is real data.
 - The project has `supabase/schema.sql` and every migration up to
-  `20260929_soapbox_images.sql` applied (the last two on 2026-09-26).
+  `20260929_soapbox_images.sql` applied (the last two on 2026-09-26);
+  `20260930_moderation.sql` is next.
 - Deploy the Soapbox bot from an up-to-date `main`: `supabase functions
   deploy` uploads whatever `supabase/functions/soapbox-bot/index.ts` is
   in the working copy, so deploying from an old branch puts an old bot
@@ -288,26 +289,21 @@ ryOS (AGPL-3.0).
 
 ## 3. Open issues and next steps
 
-1. **Redeploy the Soapbox bot from `main`.** On 2026-09-26 it was
-   deployed from the `fix/chat-bubble-width` branch, whose bot predates
-   photos, so photos probably still get "Only text for now.":
-
-   ```sh
-   git checkout main && git pull
-   supabase functions deploy soapbox-bot --no-verify-jwt --project-ref hszogpoyyqgwjuznbegd
-   ```
-
-   Then send the bot a photo, an album and a `#rant` caption. (Both
-   migrations, chat rooms and Soapbox photos, are run.)
+1. **Run `supabase/migrations/20260930_moderation.sql` and redeploy the
+   bot from `main`** (`git pull`, then `supabase functions deploy
+   soapbox-bot --no-verify-jwt --project-ref hszogpoyyqgwjuznbegd`).
+   Then send the bot anything (say `/watch`): it registers itself, and
+   new Stickies notes and public chat messages arrive with a 🙈 Hide
+   button. The same deploy fixes `/at <city>`, which had been failing.
 2. **Try a private conversation** between two accounts in two browsers,
    now that the chat rooms migration is in.
 3. **Try on a real device:** Photo Booth with a real camera (only a fake
    one was tested), the Terminal's `say` out loud, and Pinball's feel on
    a phone.
-4. **Moderation, if Stickies or Chat attract spam.** Options discussed: a
-   Telegram message per new note or chat message, from the Soapbox bot,
-   with a "hide" button; an owner-only review app in JM/OS behind Supabase
-   Auth; automatic filtering in front of either.
+4. **Moderation** is in (2026-09-26): every new Stickies note and public
+   chat message goes to the owner on Telegram with Hide / Show again;
+   `/watch off` stops it. Automatic filtering in front of it is still an
+   option if spam gets heavy.
 5. **Photos freshness.** Without `UNSPLASH_ACCESS_KEY`, new Unsplash
    uploads reach the site only when the weekly workflow refreshes the
    snapshot, and only if GitHub's runners aren't blocked too.
@@ -323,12 +319,15 @@ ryOS (AGPL-3.0).
    background tabs, so a song started in a hidden tab waits until the tab
    is shown. `/api/lyrics` only runs on Vercel; under `astro dev` those
    songs show the listening view.
-8. **Possible next work:** automated tests for the window manager, the
-   social rules and Pinball's physics (the headless bots used to check
-   it could become a test); password reset through the recovery address
-   (needs a Supabase Edge Function and an email sender); the Chinese site
-   and the AI assistant later; an ocra review-replay app once ocra's
-   redesign is done.
+8. **Tests and CI** are in: `npm test` (Vitest: Spider's rules, Pinball's
+   physics by bot, the window manager, the Soapbox bot under a fake
+   Telegram and Supabase) and `npm run test:db` (27 database rules
+   against Postgres, with stand-ins for Supabase's auth, storage and
+   pg_net). `.github/workflows/ci.yml` runs both and the build on every
+   pull request. **Possible next work:** password reset through the
+   recovery address (needs a Supabase Edge Function and an email sender,
+   e.g. a Resend API key); the Chinese site and the AI assistant later;
+   an ocra review-replay app once ocra's redesign is done.
 9. **Still missing compared with ryOS:** in Chat, @ryo (AI replies), voice
    messages, IRC rooms and admins making rooms from the app; the first is
    on hold with the AI assistant, the rest were left out. Signals
