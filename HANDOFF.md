@@ -49,8 +49,9 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   icon that opened them, and windows that can be thrown and bounce off
   the screen edges.
 - Exposé: F9, the bottom-left hot corner or View → Exposé.
-- Screensavers: Photos (Ken Burns), Starfield or Clock, after the idle
-  time set in System Preferences (two minutes by default).
+- Screensavers: Desktop Pictures (Ken Burns over Mac OS X's pictures),
+  Flurry, Soapbox, Starfield, Clock or Bounce, after the idle time set in
+  System Preferences (two minutes by default).
 - Place: the visitor's city, coordinates and time zone come from their
   IP address through `api/geo.ts` (Vercel's `x-vercel-ip-*` headers; no
   prompt, nothing stored). They can pick another city instead.
@@ -73,7 +74,7 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   Calculator; an accent colour sampled from the desktop picture (or a
   fixed one); background windows go grey; glossy Aqua buttons, pop-ups,
   checkboxes, radios and sliders; an optional Glass material; Tiger
-  drawers (Photos Info, Finder Get Info); six screen savers (Photos,
+  drawers (Photos Info, Finder Get Info); six screen savers (Desktop Pictures,
   Flurry, Soapbox, Starfield, Clock, Bounce); desktop pictures in
   collections, including solid colours, patterns and a dynamic sky.
 
@@ -93,7 +94,8 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   builds usually fall back to the committed snapshot in
   `src/data/photos.json` (set `UNSPLASH_ACCESS_KEY` to use the official
   API instead). The viewer shows the whole photo, resizes the window to
-  its proportions, and can set it as the desktop picture.
+  its proportions, and can AirDrop it. His photos aren't used as desktop
+  pictures.
 - **Accounts:** a username and a password (and an optional recovery
   address), in a ryOS-style window (Create Account / Sign In). Apple menu
   Sign In… / Sign Out; the username sits at the right of the menu bar.
@@ -265,62 +267,52 @@ ryOS (AGPL-3.0).
 
 ### Decisions
 
-- **The King of Fighters '98** (looked into 2026-09-26): a Neo Geo
-  emulator runs well in the browser (EmulatorJS with the FBNeo core,
-  WebAssembly), but the game ROM and the Neo Geo BIOS are SNK's, so the
-  site can't host them. The only lawful way is "bring your own ROM": the
-  visitor picks their own kof98.zip and neogeo.zip, which stay in their
-  browser. Not built; it would be an applet loading the emulator from
-  its CDN (GPL), with keyboard and gamepad controls.
+- **No King of Fighters '98** (decided 2026-09-26). A Neo Geo emulator
+  runs well in the browser (EmulatorJS with the FBNeo core), but the
+  game ROM and the BIOS are SNK's and can't be hosted; the only lawful
+  version makes visitors bring their own ROM, which isn't worth having
+  when it can't just be played. The same goes for other commercial
+  games: build originals in their spirit, as Pinball is.
+- **Jincheng's photos are for Photos only**, not desktop pictures or the
+  screen saver, which use Mac OS X's own pictures.
+- **AirDrop is for members**, as in ryOS.
 
 - No link back to a classic site; Chinese is on hold.
 - Don't change ocra for now; it will be redesigned.
 - The "Ask me" AI assistant is on hold.
-- Stickies has no review step and no login, by choice; one note per
-  visitor is the only rule. To hide a note, set `approved` to false in
-  the Supabase Table editor.
+- Stickies has no review step, by choice: members only, three notes a
+  day. To hide a note, set `approved` to false in the Supabase Table
+  editor.
 
 ## 3. Open issues and next steps
 
-0. **Run `supabase/migrations/20260929_soapbox_images.sql`**, then
-   **redeploy the bot** (`supabase functions deploy soapbox-bot
-   --no-verify-jwt --project-ref hszogpoyyqgwjuznbegd`) so it takes
-   photos. Tested on Postgres 16 and with the bot under a mocked
-   Telegram; send it a photo and an album to check for real.
-0. **Run `supabase/migrations/20260928_chat_rooms.sql`** in the SQL
-   editor (test it inside `begin; … rollback;` first). It was checked
-   against Postgres 16 with a stand-in auth schema: fresh, on top of the
-   previous schema, and run twice. Then try a private conversation
-   between two accounts in two browsers.
-1. **Merge the 2026-09-25 stack, bottom up:** #19 (visitor location) →
-   #20 (visitor cities in presence) → #21 (System Preferences) → #22
-   (Soapbox) → #23 (⌥Tab) → #24 (sounds) → #25 (Soapbox on the
-   Dashboard) → #26 (draggable icons) → #27 (Minesweeper). Then **set Soapbox up**: follow
-   `supabase/functions/soapbox-bot/README.md` (migration, @BotFather,
-   secrets, deploy with `--no-verify-jwt`, `setWebhook`). Until then the
-   app is empty.
-
-The issues listed in the first handoff are resolved: `/zh/` paths with a
-trailing slash redirect, the Security Checkpoint no longer blocks
-non-browser requests, the canonical URL matches the `www` domain, Assay's
-links point at `assay-sql.vercel.app`, and the stray `majincheng` Vercel
-project is gone. PRs #13–#17 are merged and every other branch is
-deleted.
-
-1. **Delete the test notes.** Two notes starting `[TEST]` and `[TEST 2]`
-   were left while checking Stickies. Visitors can't delete, so remove
-   them in Supabase → Table Editor → notes. `[TEST 2]` holds the owner's
-   IP slot until it's gone. [DONE]
-2. **Moderation, if Stickies attracts spam.** Options discussed: an email
-   (or Telegram) notification per note with signed approve/delete links
-   via a Supabase Edge Function; an owner-only review app in JM/OS behind
-   Supabase Auth; automatic filtering in front of either.
-3. **Photos freshness.** Without `UNSPLASH_ACCESS_KEY`, new Unsplash
+1. **Run `supabase/migrations/20260928_chat_rooms.sql`** (chat rooms and
+   private conversations) in the SQL editor, testing it inside `begin; …
+   rollback;` first. It was checked against Postgres 16 with a stand-in
+   auth schema: fresh, on top of the previous schema, and run twice. Then
+   try a private conversation between two accounts in two browsers.
+2. **Run `supabase/migrations/20260929_soapbox_images.sql`, then redeploy
+   the bot** (`supabase functions deploy soapbox-bot --no-verify-jwt
+   --project-ref hszogpoyyqgwjuznbegd`) so it takes photos. Tested on
+   Postgres 16 and with the bot under a mocked Telegram (text, a photo,
+   a rant caption, an album out of order, a PNG file, a PDF, a sticker, a
+   caption edit, /delete, a stranger); send it a photo and an album to
+   check for real.
+3. **Try on a real device:** Photo Booth with a real camera (only a fake
+   one was tested), the Terminal's `say` out loud, and Pinball's feel on
+   a phone.
+4. **Moderation, if Stickies or Chat attract spam.** Options discussed: a
+   Telegram message per new note or chat message, from the Soapbox bot,
+   with a "hide" button; an owner-only review app in JM/OS behind Supabase
+   Auth; automatic filtering in front of either.
+5. **Photos freshness.** Without `UNSPLASH_ACCESS_KEY`, new Unsplash
    uploads reach the site only when the weekly workflow refreshes the
    snapshot, and only if GitHub's runners aren't blocked too.
-4. **Branch hygiene.** Turning on "Automatically delete head branches"
-   in the GitHub repo settings would make the cleanup above automatic.
-5. **Songs.** Ten of the starter songs remain (timing carried over from
+6. **Branch hygiene.** Sessions here can't delete remote branches, so
+   merged ones stay behind (`claude/task-knphtp`, `fix/chat-bubble-width`).
+   Turning on "Automatically delete head branches" in the GitHub repo
+   settings would clean them up.
+7. **Songs.** Ten of the starter songs remain (timing carried over from
    ryOS's values, unchecked by ear), plus 寧夏, Kiss & Tell, 寫信給你,
    心動 and 三個人的晚餐 (lyrics from NetEase) and BTTB. 三個人的晚餐
    uses the official MV, which is ten seconds shorter than the album cut,
@@ -328,32 +320,28 @@ deleted.
    background tabs, so a song started in a hidden tab waits until the tab
    is shown. `/api/lyrics` only runs on Vercel; under `astro dev` those
    songs show the listening view.
-6. **Possible next work:** automated tests for the window manager and
-   the social rules; moderation notifications (a Telegram message per new
-   note or chat message, from the Soapbox bot, with a "hide" button);
-   password reset through the recovery address (needs a Supabase Edge
-   Function and an email sender); the Chinese site and the AI assistant
-   later; an ocra review-replay app once ocra's redesign is done.
-9. **Outside suggestions reviewed (2026-09-26).** Done: restoring windows
-   after a reload; one storage helper; src/os and os.css split by domain;
-   a declarative app registry; landscape phones and safe areas; Exposé by
-   keyboard; the "Follow the sun" fallback note; a first-visit welcome; a
-   Dashboard widget of visitors' cities; timeouts on the lyrics relay.
-   Already the case, measured: every app is its own lazily loaded chunk
-   (the desktop is 86 KB gzipped plus React's 64 KB; the song and
-   wallpaper catalogues add 4 KB; opencc-js is server-only); all desktop
-   pictures are WebP ≤ 2560px. Not done, on purpose: a focus trap in
-   windows (they aren't modal); a "continue playing" prompt for hidden
-   tabs (Chrome starts the video by itself when the tab is shown); more
-   reduced-motion fallbacks (the big motions already have them).
-7. **Visual parity with ryOS** is largely done (see Look above). Left
-   on purpose: multiple OS themes (System 7, XP, 98), video wallpapers.
-8. **Still missing compared with ryOS:** in Chat, ryOS also has @ryo (AI
-   replies), voice messages, IRC rooms and admins making rooms from the
-   app; the first is on hold with the AI assistant, the rest were left
-   out. Signals (typing, nudges, AirDrop) go over the shared presence
-   channel, so they aren't private and anyone could forge one; receivers
-   only act on well-formed ones, and neither carries anything but names
-   and Macintosh HD paths. Deliberately skipped: ryOS's Videos app, emulators, a virtual file system, multiple themes and AI
-   chat. Listen to the sounds once (#24); they were checked by
+8. **Possible next work:** automated tests for the window manager, the
+   social rules and Pinball's physics (the headless bots used to check
+   it could become a test); password reset through the recovery address
+   (needs a Supabase Edge Function and an email sender); the Chinese site
+   and the AI assistant later; an ocra review-replay app once ocra's
+   redesign is done.
+9. **Still missing compared with ryOS:** in Chat, @ryo (AI replies), voice
+   messages, IRC rooms and admins making rooms from the app; the first is
+   on hold with the AI assistant, the rest were left out. Signals
+   (typing, nudges, AirDrop) go over the shared presence channel, so they
+   aren't private and anyone could forge one; receivers only act on
+   well-formed ones, and none carries anything but names and Macintosh HD
+   paths. Deliberately skipped: ryOS's Videos app, emulators, a virtual
+   file system, multiple OS themes (System 7, XP, 98), video wallpapers
+   and AI chat. Listen to the sounds once; they were checked by
    instrumentation, not by ear.
+10. **Outside suggestions reviewed (2026-09-26).** Done: restoring windows
+    after a reload; one storage helper; src/os and os.css split by
+    domain; a declarative app registry; landscape phones and safe areas;
+    Exposé by keyboard; the "Follow the sun" fallback note; a first-visit
+    welcome; a Dashboard widget of visitors' cities; timeouts on the
+    lyrics relay. Already the case, measured: every app is its own lazily
+    loaded chunk; all desktop pictures are WebP ≤ 2560px. Not done, on
+    purpose: a focus trap in windows (they aren't modal); a "continue
+    playing" prompt for hidden tabs; more reduced-motion fallbacks.
