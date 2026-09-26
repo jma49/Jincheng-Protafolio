@@ -34,8 +34,9 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   or reset the desktop picture, Exposé and the screensaver.
 - Dock: one floating, rounded pane of frosted glass with magnification,
   running dots, a Dashboard toggle and a trash can. It keeps Finder,
-  Projects, Photos, iPod, Chat and System Preferences; other apps show up
-  there while they're open, and right-clicking one gives its menu.
+  Projects, Photos, iPod and Chat; other apps show up there while
+  they're open, and right-clicking one gives its menu. Its size and
+  magnification are set in System Preferences › Dock.
 - Now playing: ♫ in the menu bar while a song is on, with a card (cover,
   ⏮ ⏯ ⏭); the browser's media keys work through the Media Session API.
   One sound switch (menu bar speaker, System Preferences › Sound)
@@ -127,8 +128,15 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   weather with a five-day forecast (flip it with "i" to pick a city);
   "Jincheng's time" in San Jose with the offset and a guess at what
   Jincheng is doing; recent GitHub activity and a sticky note.
-- **System Preferences:** Desktop & Screen Saver, Appearance (Automatic,
-  Light, Dark, Follow the sun) and Date, Time & Place.
+- **System Preferences** (Apple menu only, not an app): Leopard's Show
+  All grid with search, back/forward and ten panes. Personal: Appearance
+  (Automatic, Light, Dark, Follow the sun; material; accent), Desktop &
+  Screen Saver, Dock (size, magnification), Date & Time (place, 24-hour
+  clock, date). Hardware & System: Displays (Night Shift, reduce motion),
+  Sound, Accounts. Internet & Network: Sharing (city, pointer, AirDrop
+  visibility, others' pointers), Software Update (build vs. `main` on
+  GitHub), Backup & Restore (settings to a file and back; reset).
+  Spotlight finds each pane.
 - **Soapbox:** Jincheng's own notes and rants, with photos (a caption
   is the text, an album is one post), posted from a Telegram bot (`supabase/functions/soapbox-bot`); visitors react with one emoji
   per post, and the newest one shows on the Dashboard. Terminal:
