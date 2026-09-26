@@ -84,7 +84,8 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
 - **About:** short and long bio.
 - **Résumé:** a Pages-style HTML document (grey canvas, white two-column
   page) with zoom and Print…, whose print styles output only the page.
-  All PDF entry points are gone.
+  There are no PDFs any more: the old `/Jincheng_Ma_Resume.pdf` and
+  `/Jincheng_Ma_Resume_CN.pdf` redirect to `/?open=resume`.
 - **Projects:** Finder-style list filtered by status, plus a detail
   window per project.
 - **Browser:** an iframe window for live demos.
