@@ -228,8 +228,8 @@ an app is open.
   deployments use the same project as production, so anything posted
   while testing a PR is real data.
 - The project has `supabase/schema.sql` and every migration up to
-  `20260929_soapbox_images.sql` applied (the last two on 2026-09-26);
-  `20260930_moderation.sql` is next.
+  `20260926080833_soapbox_images.sql` applied (the last two on 2026-09-26);
+  `20260926091033_moderation.sql` is next.
 - Deploy the Soapbox bot from an up-to-date `main`: `supabase functions
   deploy` uploads whatever `supabase/functions/soapbox-bot/index.ts` is
   in the working copy, so deploying from an old branch puts an old bot
@@ -299,14 +299,13 @@ ryOS (AGPL-3.0).
 
 ## 3. Open issues and next steps
 
-1. **Run `supabase/migrations/20261003_advisor.sql`** in the Supabase
-   SQL editor, then run Advisors › Security again. Expected leftovers:
-   - members can call `my_reactions`, `my_recovery_email`,
-     `set_recovery_email` and `chat_can_write`, on purpose;
+1. **The database is up to date** (2026-09-26). Every migration in
+   `supabase/migrations/`, through `20260926100511_advisor.sql`, has been
+   run in the SQL editor. Password reset (`account-recovery`) is live and
+   sends mail. The Security Advisor shows only the two findings kept on
+   purpose:
+   - members can call `my_reactions` and the other member-only helpers;
    - leaked password protection (an Auth setting on the Pro plan).
-
-   Password reset (20261001, 20261002 and the `account-recovery`
-   function) is live and sends mail.
 2. **Moderation** is in (2026-09-26): every new Stickies note and public
    chat message goes to the owner on Telegram with Hide / Show again;
    `/watch off` stops it. Automatic filtering in front of it is still an
@@ -356,7 +355,7 @@ ryOS (AGPL-3.0).
     - chat signals tied to the sender's presence;
     - security headers;
     - bounded inputs on `/api/*`;
-    - Security Advisor findings (20261003): trigger functions no longer
+    - Security Advisor findings (the advisor migration): trigger functions no longer
       callable over the API, `username_available` runs as the caller,
       and reactions check the post and the member;
     - Astro 5 → 7 (with @astrojs/react 7, Vite 8), which clears the
