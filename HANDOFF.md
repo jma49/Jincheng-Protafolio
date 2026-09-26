@@ -358,16 +358,14 @@ ryOS (AGPL-3.0).
     - bounded inputs on `/api/*`;
     - Security Advisor findings (20261003): trigger functions no longer
       callable over the API, `username_available` runs as the caller,
-      and reactions check the post and the member.
+      and reactions check the post and the member;
+    - Astro 5 → 7 (with @astrojs/react 7, Vite 8), which clears the
+      Astro, sharp and esbuild advisories: `npm audit` reports none.
     Known and accepted:
     - Presence names are the client's own claim (a signed-out visitor
       could show up as "jincheng" on a cursor or in AirDrop). Signals
       only carry names and Macintosh HD paths. Proper identity would
       need Realtime Authorization and server-checked presence.
-    - Astro 5 and sharp have advisories, fixed only in Astro 7. They
-      concern server rendering, `define:vars`, server islands and image
-      decoding of untrusted files, none of which this static site uses.
-      Upgrade when there's time for a major migration.
     - There's no full script CSP: Astro's inline hydration and the
       YouTube player would need it loosened too far to help.
     In the Supabase dashboard:
