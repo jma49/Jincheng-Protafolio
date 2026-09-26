@@ -126,8 +126,8 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   Jincheng is doing; recent GitHub activity and a sticky note.
 - **System Preferences:** Desktop & Screen Saver, Appearance (Automatic,
   Light, Dark, Follow the sun) and Date, Time & Place.
-- **Soapbox:** Jincheng's own notes and rants, posted from a Telegram
-  bot (`supabase/functions/soapbox-bot`); visitors react with one emoji
+- **Soapbox:** Jincheng's own notes and rants, with photos (a caption
+  is the text, an album is one post), posted from a Telegram bot (`supabase/functions/soapbox-bot`); visitors react with one emoji
   per post, and the newest one shows on the Dashboard. Terminal:
   `soapbox`, `weather [city]`.
 - **iPod:** a fifth-generation iPod with a working click wheel (drag,
@@ -268,6 +268,11 @@ ryOS (AGPL-3.0).
 
 ## 3. Open issues and next steps
 
+0. **Run `supabase/migrations/20260929_soapbox_images.sql`**, then
+   **redeploy the bot** (`supabase functions deploy soapbox-bot
+   --no-verify-jwt --project-ref hszogpoyyqgwjuznbegd`) so it takes
+   photos. Tested on Postgres 16 and with the bot under a mocked
+   Telegram; send it a photo and an album to check for real.
 0. **Run `supabase/migrations/20260928_chat_rooms.sql`** in the SQL
    editor (test it inside `begin; … rollback;` first). It was checked
    against Postgres 16 with a stand-in auth schema: fresh, on top of the
@@ -329,8 +334,7 @@ deleted.
    reduced-motion fallbacks (the big motions already have them).
 7. **Visual parity with ryOS** is largely done (see Look above). Left
    on purpose: multiple OS themes (System 7, XP, 98), video wallpapers.
-8. **Still missing compared with ryOS:** Soapbox photos (Telegram
-   images into Supabase Storage). In Chat, ryOS also has @ryo (AI
+8. **Still missing compared with ryOS:** in Chat, ryOS also has @ryo (AI
    replies), voice messages, IRC rooms and admins making rooms from the
    app; the first is on hold with the AI assistant, the rest were left
    out. Signals (typing, nudges, AirDrop) go over the shared presence
