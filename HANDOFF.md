@@ -29,13 +29,13 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   desktop picture, with white or black text to suit the picture, and
   opaque over a zoomed window or an app on a phone. The Apple logo takes
   the accent colour, so it follows the desktop picture.
-- Desktop icons: Macintosh HD, About Me, Résumé, Projects, Photos,
-  Stickies, Terminal. Right-clicking the empty desktop offers to change
+- Desktop icons: Macintosh HD, About Me, Résumé, Projects (phones list
+  every app). Right-clicking the empty desktop offers to change
   or reset the desktop picture, Exposé and the screensaver.
 - Dock: one floating, rounded pane of frosted glass with magnification,
-  running dots, a Dashboard toggle and a trash can. It keeps Projects,
-  Photos, iPod, Stickies, Soapbox, Terminal and System Preferences; other
-  apps show up there while they're open.
+  running dots, a Dashboard toggle and a trash can. It keeps Finder,
+  Projects, Photos, iPod, Chat and System Preferences; other apps show up
+  there while they're open, and right-clicking one gives its menu.
 - Now playing: ♫ in the menu bar while a song is on, with a card (cover,
   ⏮ ⏯ ⏭); the browser's media keys work through the Media Session API.
   One sound switch (menu bar speaker, System Preferences › Sound)
@@ -114,7 +114,8 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   and mentions reach a signed-in member with Chat closed as a Growl-style
   notification and a badge on the Dock. Members can take back their own
   messages; eight messages in 30 seconds at most.
-- **AirDrop:** Lion-style radar of everyone else on the desktop. Share a
+- **AirDrop:** for signed-in members; a Lion-style radar of the other
+  members on the desktop. Share a
   photo, project, song, app or folder from Finder (right-click, or drag
   onto AirDrop), Photos or a project window; the other visitor accepts
   or declines, and accepting opens it. Only a Macintosh HD path travels,
