@@ -84,7 +84,8 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
 - **About:** short and long bio.
 - **Résumé:** a Pages-style HTML document (grey canvas, white two-column
   page) with zoom and Print…, whose print styles output only the page.
-  All PDF entry points are gone.
+  There are no PDFs any more: the old `/Jincheng_Ma_Resume.pdf` and
+  `/Jincheng_Ma_Resume_CN.pdf` redirect to `/?open=resume`.
 - **Projects:** Finder-style list filtered by status, plus a detail
   window per project.
 - **Browser:** an iframe window for live demos.
@@ -360,6 +361,17 @@ ryOS (AGPL-3.0).
       and reactions check the post and the member;
     - Astro 5 → 7 (with @astrojs/react 7, Vite 8), which clears the
       Astro, sharp and esbuild advisories: `npm audit` reports none.
+    Performance audit (2026-09-26), measured with `npm run perf`:
+    - a drag with six apps open: script time 640 ms to 210 ms (the desktop
+      no longer re-renders per frame; windows are memoized);
+    - a first visit: images 2.2 MB to 0.95 MB (the desktop picture was
+      fetched twice; quality 75), fonts 389 KB to 185 KB (subset);
+    - the screen saver's views load lazily; an idle desktop costs about
+      10 ms of script in five seconds.
+
+    What's left is framework weight: react-dom (65 KB gzip) and motion
+    (40 KB). Motion could shrink with `LazyMotion`, at the cost of
+    touching every animated component.
     Known and accepted:
     - Presence names are the client's own claim (a signed-out visitor
       could show up as "jincheng" on a cursor or in AirDrop). Signals
