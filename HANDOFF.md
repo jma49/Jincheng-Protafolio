@@ -101,7 +101,9 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   address), in a ryOS-style window (Create Account / Sign In). Apple menu
   Sign In… / Sign Out; the username sits at the right of the menu bar.
   Supabase Auth with an address made from the username, so "Confirm
-  email" must be off in the project.
+  email" must be off in the project. Forgot your password? A one-time
+  link goes to the recovery address (Edge Function `account-recovery`,
+  mail through Resend); members add or change the address once signed in.
 - **Stickies:** a guestbook of notes in the style of Mac OS X Stickies,
   stored in Supabase. Members only (since 2026-09-26): three notes in any
   24 hours, enforced by a trigger, signed with the username; members can
@@ -297,29 +299,18 @@ ryOS (AGPL-3.0).
 
 ## 3. Open issues and next steps
 
-1. **Run `supabase/migrations/20260930_moderation.sql` and redeploy the
-   bot from `main`** (`git pull`, then `supabase functions deploy
-   soapbox-bot --no-verify-jwt --project-ref hszogpoyyqgwjuznbegd`).
-   Then send the bot anything (say `/watch`): it registers itself, and
-   new Stickies notes and public chat messages arrive with a 🙈 Hide
-   button. The same deploy fixes `/at <city>`, which had been failing.
-2. **Try a private conversation** between two accounts in two browsers,
-   now that the chat rooms migration is in.
-3. **Try on a real device:** Photo Booth with a real camera (only a fake
-   one was tested), the Terminal's `say` out loud, and Pinball's feel on
-   a phone.
-4. **Moderation** is in (2026-09-26): every new Stickies note and public
+1. **Run two migrations and deploy one function** (2026-09-26): in the
+   Supabase SQL editor run `supabase/migrations/20261001_password_reset.sql`
+   and then `20261002_hardening.sql`; then
+   `supabase functions deploy account-recovery --no-verify-jwt`.
+   `RESEND_API_KEY` is set; `majincheng.com` must be verified in Resend.
+   Try it: add a recovery address in the Account window, sign out, and
+   use "Forgot your password?".
+2. **Moderation** is in (2026-09-26): every new Stickies note and public
    chat message goes to the owner on Telegram with Hide / Show again;
    `/watch off` stops it. Automatic filtering in front of it is still an
    option if spam gets heavy.
-5. **Photos freshness.** Without `UNSPLASH_ACCESS_KEY`, new Unsplash
-   uploads reach the site only when the weekly workflow refreshes the
-   snapshot, and only if GitHub's runners aren't blocked too.
-6. **Branch hygiene.** Sessions here can't delete remote branches, so
-   merged ones stay behind (`claude/task-knphtp`, `fix/chat-bubble-width`).
-   Turning on "Automatically delete head branches" in the GitHub repo
-   settings would clean them up.
-7. **Songs.** Ten of the starter songs remain (timing carried over from
+3. **Songs.** Ten of the starter songs remain (timing carried over from
    ryOS's values, unchecked by ear), plus 寧夏, Kiss & Tell, 寫信給你,
    心動 and 三個人的晚餐 (lyrics from NetEase) and BTTB. 三個人的晚餐
    uses the official MV, which is ten seconds shorter than the album cut,
@@ -327,16 +318,15 @@ ryOS (AGPL-3.0).
    background tabs, so a song started in a hidden tab waits until the tab
    is shown. `/api/lyrics` only runs on Vercel; under `astro dev` those
    songs show the listening view.
-8. **Tests and CI** are in: `npm test` (Vitest: Spider's rules, Pinball's
+4. **Tests and CI** are in: `npm test` (Vitest: Spider's rules, Pinball's
    physics by bot, the window manager, the Soapbox bot under a fake
-   Telegram and Supabase) and `npm run test:db` (27 database rules
-   against Postgres, with stand-ins for Supabase's auth, storage and
-   pg_net). `.github/workflows/ci.yml` runs both and the build on every
-   pull request. **Possible next work:** password reset through the
-   recovery address (needs a Supabase Edge Function and an email sender,
-   e.g. a Resend API key); the Chinese site and the AI assistant later;
+   Telegram and Supabase, the account-recovery function) and
+   `npm run test:db` (about 50 database rules, plus races against the
+   per-member limits, on Postgres with stand-ins for Supabase's auth,
+   storage and pg_net). `.github/workflows/ci.yml` runs both and the build on every
+   pull request. **Possible next work:** the Chinese site and the AI assistant later;
    an ocra review-replay app once ocra's redesign is done.
-9. **Still missing compared with ryOS:** in Chat, @ryo (AI replies), voice
+5. **Still missing compared with ryOS:** in Chat, @ryo (AI replies), voice
    messages, IRC rooms and admins making rooms from the app; the first is
    on hold with the AI assistant, the rest were left out. Signals
    (typing, nudges, AirDrop) go over the shared presence channel, so they
@@ -346,7 +336,7 @@ ryOS (AGPL-3.0).
    file system, multiple OS themes (System 7, XP, 98), video wallpapers
    and AI chat. Listen to the sounds once; they were checked by
    instrumentation, not by ear.
-10. **Outside suggestions reviewed (2026-09-26).** Done: restoring windows
+6. **Outside suggestions reviewed (2026-09-26).** Done: restoring windows
     after a reload; one storage helper; src/os and os.css split by
     domain; a declarative app registry; landscape phones and safe areas;
     Exposé by keyboard; the "Follow the sun" fallback note; a first-visit
@@ -355,3 +345,30 @@ ryOS (AGPL-3.0).
     loaded chunk; all desktop pictures are WebP ≤ 2560px. Not done, on
     purpose: a focus trap in windows (they aren't modal); a "continue
     playing" prompt for hidden tabs; more reduced-motion fallbacks.
+7. **Security review (2026-09-26).** Fixed:
+    - the per-member limits (notes, chat, reset links) let simultaneous
+      requests through; they now take advisory locks, and race.sh proves
+      it;
+    - site-wide caps on chat, sign-ups and reset mail;
+    - an index for the chat limit;
+    - reset mail sent after the answer (no timing oracle);
+    - chat signals tied to the sender's presence;
+    - security headers;
+    - bounded inputs on `/api/*`.
+    Known and accepted:
+    - Presence names are the client's own claim (a signed-out visitor
+      could show up as "jincheng" on a cursor or in AirDrop). Signals
+      only carry names and Macintosh HD paths. Proper identity would
+      need Realtime Authorization and server-checked presence.
+    - Astro 5 and sharp have advisories, fixed only in Astro 7. They
+      concern server rendering, `define:vars`, server islands and image
+      decoding of untrusted files, none of which this static site uses.
+      Upgrade when there's time for a major migration.
+    - There's no full script CSP: Astro's inline hydration and the
+      YouTube player would need it loosened too far to help.
+    In the Supabase dashboard:
+    - run Advisors › Security;
+    - keep Settings › API › Exposed schemas to `public` (and
+      `graphql_public` only if GraphQL is used; otherwise disable it);
+    - consider CAPTCHA under Auth › Attack Protection if sign-up spam
+      appears (it needs a widget in the Account window).
