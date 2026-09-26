@@ -217,10 +217,12 @@ an app is open.
   exposes the `NEXT_PUBLIC_` prefix through `vite.envPrefix`). Preview
   deployments use the same project as production, so anything posted
   while testing a PR is real data.
-- The project has `supabase/schema.sql` and the migrations up to
-  `20260927_accounts_chat.sql` applied. **`20260928_chat_rooms.sql`
-  (rooms and private conversations) still needs running**; until then
-  Chat falls back to the one Lobby.
+- The project has `supabase/schema.sql` and every migration up to
+  `20260929_soapbox_images.sql` applied (the last two on 2026-09-26).
+- Deploy the Soapbox bot from an up-to-date `main`: `supabase functions
+  deploy` uploads whatever `supabase/functions/soapbox-bot/index.ts` is
+  in the working copy, so deploying from an old branch puts an old bot
+  live.
   `schema.sql` always describes the full current state for a new
   project; changes to an existing one go in a new dated file under
   `supabase/migrations/`, written so it can be rerun, and the owner runs
@@ -286,18 +288,19 @@ ryOS (AGPL-3.0).
 
 ## 3. Open issues and next steps
 
-1. **Run `supabase/migrations/20260928_chat_rooms.sql`** (chat rooms and
-   private conversations) in the SQL editor, testing it inside `begin; …
-   rollback;` first. It was checked against Postgres 16 with a stand-in
-   auth schema: fresh, on top of the previous schema, and run twice. Then
-   try a private conversation between two accounts in two browsers.
-2. **Run `supabase/migrations/20260929_soapbox_images.sql`, then redeploy
-   the bot** (`supabase functions deploy soapbox-bot --no-verify-jwt
-   --project-ref hszogpoyyqgwjuznbegd`) so it takes photos. Tested on
-   Postgres 16 and with the bot under a mocked Telegram (text, a photo,
-   a rant caption, an album out of order, a PNG file, a PDF, a sticker, a
-   caption edit, /delete, a stranger); send it a photo and an album to
-   check for real.
+1. **Redeploy the Soapbox bot from `main`.** On 2026-09-26 it was
+   deployed from the `fix/chat-bubble-width` branch, whose bot predates
+   photos, so photos probably still get "Only text for now.":
+
+   ```sh
+   git checkout main && git pull
+   supabase functions deploy soapbox-bot --no-verify-jwt --project-ref hszogpoyyqgwjuznbegd
+   ```
+
+   Then send the bot a photo, an album and a `#rant` caption. (Both
+   migrations, chat rooms and Soapbox photos, are run.)
+2. **Try a private conversation** between two accounts in two browsers,
+   now that the chat rooms migration is in.
 3. **Try on a real device:** Photo Booth with a real camera (only a fake
    one was tested), the Terminal's `say` out loud, and Pinball's feel on
    a phone.
