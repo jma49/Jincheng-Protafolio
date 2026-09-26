@@ -1,6 +1,6 @@
 # Handoff: majincheng.com (JM/OS)
 
-State of the project as of 2026-09-25, for picking the work up in a new
+State of the project as of 2026-09-26, for picking the work up in a new
 session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
 
 ## 1. What's done
@@ -103,9 +103,23 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   stored in Supabase. Members only (since 2026-09-26): three notes in any
   24 hours, enforced by a trigger, signed with the username; members can
   take their own down. Notes show right away.
-- **Chat:** one iChat-style room, readable by anyone, written by members,
-  kept for good, live over Realtime. Members can take back their own
+- **Chat:** iChat-style, after ryOS's Chats: public rooms (Lobby, Music,
+  Dev, Photography; more can be added in `chat_rooms`) in a sidebar with
+  how many people are in each and unread counts, and private
+  conversations between two members ("New Message…" or a click on an
+  avatar). Readable by anyone, written by members, kept for good, live
+  over Realtime. Typing indicators (public rooms), @mentions with
+  completion, big emoji-only messages, links, a "new messages" button,
+  and a nudge that shakes the other member's window. Private messages
+  and mentions reach a signed-in member with Chat closed as a Growl-style
+  notification and a badge on the Dock. Members can take back their own
   messages; eight messages in 30 seconds at most.
+- **AirDrop:** Lion-style radar of everyone else on the desktop. Share a
+  photo, project, song, app or folder from Finder (right-click, or drag
+  onto AirDrop), Photos or a project window; the other visitor accepts
+  or declines, and accepting opens it. Only a Macintosh HD path travels,
+  looked up on the receiver's own disk. "Allow me to be discovered by:
+  No One" turns it off.
 - **Dashboard:** the visitor's clock (dark at night), calendar and
   weather with a five-day forecast (flip it with "i" to pick a city);
   "Jincheng's time" in San Jose with the offset and a guess at what
@@ -133,7 +147,10 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   Ryuichi Sakamoto's BTTB -20th Anniversary Edition- (18 tracks);
   lyrics come from lrclib.net, or NetEase via `/api/lyrics`.
 - **Finder:** Macintosh HD opens a Finder over Applications, Applets,
-  Documents, Pictures and Projects, with icon and list views.
+  Documents, Music (albums as folders; a song plays on the iPod),
+  Pictures and Projects, with icon, list (sortable headers) and column
+  views, Quick Look (Space), arrow keys and type-to-select, a
+  right-click menu and AirDrop in the sidebar.
 - **Applet Store:** Get / Open / Remove for the applets, which install
   into Finder's Applets folder and Spotlight: **Minesweeper** (installed
   by default), **Tile Game** (a 4 × 4 sliding puzzle cut from a random
@@ -180,8 +197,10 @@ an app is open.
   exposes the `NEXT_PUBLIC_` prefix through `vite.envPrefix`). Preview
   deployments use the same project as production, so anything posted
   while testing a PR is real data.
-- The project has `supabase/schema.sql` and
-  `supabase/migrations/20260925_one_note_per_visitor.sql` applied.
+- The project has `supabase/schema.sql` and the migrations up to
+  `20260927_accounts_chat.sql` applied. **`20260928_chat_rooms.sql`
+  (rooms and private conversations) still needs running**; until then
+  Chat falls back to the one Lobby.
   `schema.sql` always describes the full current state for a new
   project; changes to an existing one go in a new dated file under
   `supabase/migrations/`, written so it can be rerun, and the owner runs
@@ -192,11 +211,11 @@ an app is open.
 
 ### Code map
 
-- `src/os/store.ts`: window map + z-order array; theme, Spotlight,
+- `src/os/core/store.ts`: window map + z-order array; theme, Spotlight,
   Dashboard, Exposé, screensaver, desktop picture and online count.
-- `src/os/Expose.tsx`, `Screensaver.tsx`, `Sky.tsx` + `weather.ts`,
-  `genie.ts`, `Presence.tsx` + `social.ts`: the features above.
-- `src/os/registry.tsx`: every app, lazily loaded; `dockApps` and
+- `src/os/shell/`, `ambient/`, `look/`, `media/`, `social/`: the
+  features above, grouped by domain (see AGENTS.md).
+- `src/os/core/registry.tsx`: every app, lazily loaded; `dockApps` and
   `mobileDockApps` choose what the Dock shows.
 - `src/os/apps/*`: one component per app.
 - `src/os/os.css`: the Aqua theme.
@@ -237,7 +256,12 @@ ryOS (AGPL-3.0).
 
 ## 3. Open issues and next steps
 
-0. **Merge the 2026-09-25 stack, bottom up:** #19 (visitor location) →
+0. **Run `supabase/migrations/20260928_chat_rooms.sql`** in the SQL
+   editor (test it inside `begin; … rollback;` first). It was checked
+   against Postgres 16 with a stand-in auth schema: fresh, on top of the
+   previous schema, and run twice. Then try a private conversation
+   between two accounts in two browsers.
+1. **Merge the 2026-09-25 stack, bottom up:** #19 (visitor location) →
    #20 (visitor cities in presence) → #21 (System Preferences) → #22
    (Soapbox) → #23 (⌥Tab) → #24 (sounds) → #25 (Soapbox on the
    Dashboard) → #26 (draggable icons) → #27 (Minesweeper). Then **set Soapbox up**: follow
@@ -294,8 +318,12 @@ deleted.
 7. **Visual parity with ryOS** is largely done (see Look above). Left
    on purpose: multiple OS themes (System 7, XP, 98), video wallpapers.
 8. **Still missing compared with ryOS:** Soapbox photos (Telegram
-   images into Supabase Storage); a Finder-style file browser over the
-   projects; more Dashboard widgets (e.g. a world clock of where
-   visitors are). Deliberately skipped: ryOS's Videos app, emulators, a virtual file system, multiple themes and AI
+   images into Supabase Storage). In Chat, ryOS also has @ryo (AI
+   replies), voice messages, IRC rooms and admins making rooms from the
+   app; the first is on hold with the AI assistant, the rest were left
+   out. Signals (typing, nudges, AirDrop) go over the shared presence
+   channel, so they aren't private and anyone could forge one; receivers
+   only act on well-formed ones, and neither carries anything but names
+   and Macintosh HD paths. Deliberately skipped: ryOS's Videos app, emulators, a virtual file system, multiple themes and AI
    chat. Listen to the sounds once (#24); they were checked by
    instrumentation, not by ear.
