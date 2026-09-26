@@ -6,6 +6,7 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
 ## 1. What's done
 
 ### Site
+
 - **majincheng.com is JM/OS**, a Mac OS X Aqua–style desktop in the
   browser. The classic one-page site is retired.
 - **Chinese site is offline.** The `zh` copy in `src/i18n/content.ts` and
@@ -23,6 +24,7 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   JSON-LD are generated.
 
 ### Shell
+
 - Menu bar with per-app menus and a clock. It's see-through over the
   desktop picture, with white or black text to suit the picture, and
   opaque over a zoomed window or an app on a phone. The Apple logo takes
@@ -76,6 +78,7 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   collections, including solid colours, patterns and a dynamic sky.
 
 ### Apps
+
 - **About:** short and long bio.
 - **Résumé:** a Pages-style HTML document (grey canvas, white two-column
   page) with zoom and Print…, whose print styles output only the page.
@@ -91,14 +94,18 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   `src/data/photos.json` (set `UNSPLASH_ACCESS_KEY` to use the official
   API instead). The viewer shows the whole photo, resizes the window to
   its proportions, and can set it as the desktop picture.
+- **Accounts:** a username and a password (and an optional recovery
+  address), in a ryOS-style window (Create Account / Sign In). Apple menu
+  Sign In… / Sign Out; the username sits at the right of the menu bar.
+  Supabase Auth with an address made from the username, so "Confirm
+  email" must be off in the project.
 - **Stickies:** a guestbook of notes in the style of Mac OS X Stickies,
-  stored in Supabase. Notes show right away; each visitor gets one,
-  enforced by a salted hash of their IP address (a unique index in the
-  database) plus a browser flag that turns the button into "Note Posted
-  ✓". People behind one shared address share a note; if the database
-  can't see an address, only the browser flag applies. Checked against
-  the live project: a second note from the same IP gets a 409 and a
-  friendly "You've already left a note".
+  stored in Supabase. Members only (since 2026-09-26): three notes in any
+  24 hours, enforced by a trigger, signed with the username; members can
+  take their own down. Notes show right away.
+- **Chat:** one iChat-style room, readable by anyone, written by members,
+  kept for good, live over Realtime. Members can take back their own
+  messages; eight messages in 30 seconds at most.
 - **Dashboard:** the visitor's clock (dark at night), calendar and
   weather with a five-day forecast (flip it with "i" to pick a city);
   "Jincheng's time" in San Jose with the offset and a guess at what
@@ -134,11 +141,13 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   SVG in `icons.tsx`.
 
 ### Phones
+
 iOS-style home screen: a four-column icon grid and a four-slot Dock.
 Apps open full screen with a "‹ Home" button, and the Dock hides while
 an app is open.
 
 ### Content
+
 - Projects, in order: ocra (in progress), Assay, majincheng.com.
 - Positioning: title is "Software Engineer"; the copy leads with
   bringing AI agents into each stage of quality control and building
@@ -146,6 +155,7 @@ an app is open.
   only and mentions bouldering (V6) and photography.
 
 ### Automation
+
 - `npm run preview:capture` builds the site, screenshots each project's
   `capture` URL into `src/content/projects/covers/*.jpg`, and captures
   the home page into `public/og.png`.
@@ -159,6 +169,7 @@ an app is open.
 ## 2. Architecture, stack and agreements
 
 ### Stack
+
 - Astro 5 + Tailwind 4. The desktop is one `client:only` React 19 island,
   with zustand for state and motion for animation.
 - Hosted on Vercel project `jincheng-protafolio`; merging to `main`
@@ -180,6 +191,7 @@ an app is open.
   and presence then hide themselves until it's resumed.
 
 ### Code map
+
 - `src/os/store.ts`: window map + z-order array; theme, Spotlight,
   Dashboard, Exposé, screensaver, desktop picture and online count.
 - `src/os/Expose.tsx`, `Screensaver.tsx`, `Sky.tsx` + `weather.ts`,
@@ -194,6 +206,7 @@ an app is open.
   `status`, `cover`, `capture`, `demo` and `repo`.
 
 ### Assets
+
 The icons, fonts (Lucida Grande, Apple Garamond, Monaco) and the stones
 wallpaper are copied from ryOS. Using them was a deliberate choice after
 discussing the Apple/Adobe copyright risk; `NOTICE` records their origin.
@@ -201,6 +214,7 @@ The `src/os` code is original and only borrows architecture ideas from
 ryOS (AGPL-3.0).
 
 ### Working agreements
+
 - English for commits, PRs, comments and docs; only the Chinese site
   copy is in Chinese.
 - Conventional Commits, one logical change per commit.
@@ -213,6 +227,7 @@ ryOS (AGPL-3.0).
   bypass to see (and the reduced-motion fallback checked separately).
 
 ### Decisions
+
 - No link back to a classic site; Chinese is on hold.
 - Don't change ocra for now; it will be redesigned.
 - The "Ask me" AI assistant is on hold.
@@ -240,7 +255,7 @@ deleted.
 1. **Delete the test notes.** Two notes starting `[TEST]` and `[TEST 2]`
    were left while checking Stickies. Visitors can't delete, so remove
    them in Supabase → Table Editor → notes. `[TEST 2]` holds the owner's
-   IP slot until it's gone.
+   IP slot until it's gone. [DONE]
 2. **Moderation, if Stickies attracts spam.** Options discussed: an email
    (or Telegram) notification per note with signed approve/delete links
    via a Supabase Edge Function; an owner-only review app in JM/OS behind
@@ -258,10 +273,24 @@ deleted.
    background tabs, so a song started in a hidden tab waits until the tab
    is shown. `/api/lyrics` only runs on Vercel; under `astro dev` those
    songs show the listening view.
-6. **Possible next work:** phone polish; persisting windows across
-   reloads; automated tests for the window manager; the Chinese site and
-   the AI assistant later; an ocra review-replay app once ocra's redesign
-   is done.
+6. **Possible next work:** automated tests for the window manager and
+   the social rules; moderation notifications (a Telegram message per new
+   note or chat message, from the Soapbox bot, with a "hide" button);
+   password reset through the recovery address (needs a Supabase Edge
+   Function and an email sender); the Chinese site and the AI assistant
+   later; an ocra review-replay app once ocra's redesign is done.
+9. **Outside suggestions reviewed (2026-09-26).** Done: restoring windows
+   after a reload; one storage helper; src/os and os.css split by domain;
+   a declarative app registry; landscape phones and safe areas; Exposé by
+   keyboard; the "Follow the sun" fallback note; a first-visit welcome; a
+   Dashboard widget of visitors' cities; timeouts on the lyrics relay.
+   Already the case, measured: every app is its own lazily loaded chunk
+   (the desktop is 86 KB gzipped plus React's 64 KB; the song and
+   wallpaper catalogues add 4 KB; opencc-js is server-only); all desktop
+   pictures are WebP ≤ 2560px. Not done, on purpose: a focus trap in
+   windows (they aren't modal); a "continue playing" prompt for hidden
+   tabs (Chrome starts the video by itself when the tab is shown); more
+   reduced-motion fallbacks (the big motions already have them).
 7. **Visual parity with ryOS** is largely done (see Look above). Left
    on purpose: multiple OS themes (System 7, XP, 98), video wallpapers.
 8. **Still missing compared with ryOS:** Soapbox photos (Telegram
