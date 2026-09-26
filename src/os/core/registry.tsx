@@ -2,6 +2,7 @@ import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
 import {
   AboutIcon,
   AccountIcon,
+  AirDropIcon,
   ChatIcon,
   AppletStoreIcon,
   CalculatorIcon,
@@ -156,7 +157,7 @@ export const apps: Record<AppId, AppDefinition> = {
     height: 480,
     minWidth: 440,
     minHeight: 300,
-    Component: lazy(() => import('../apps/Finder'))
+    Component: lazy(() => import('../apps/finder/Finder'))
   },
   appstore: {
     inApplications: true,
@@ -230,6 +231,16 @@ export const apps: Record<AppId, AppDefinition> = {
     minWidth: 360,
     minHeight: 340,
     Component: lazy(() => import('../apps/Chat'))
+  },
+  airdrop: {
+    inApplications: true,
+    name: 'AirDrop',
+    Icon: AirDropIcon,
+    width: 520,
+    height: 500,
+    minWidth: 380,
+    minHeight: 400,
+    Component: lazy(() => import('../apps/AirDrop'))
   },
   account: {
     name: 'Account',
