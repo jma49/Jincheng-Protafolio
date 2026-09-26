@@ -299,13 +299,14 @@ ryOS (AGPL-3.0).
 
 ## 3. Open issues and next steps
 
-1. **Run two migrations and deploy one function** (2026-09-26): in the
-   Supabase SQL editor run `supabase/migrations/20261001_password_reset.sql`
-   and then `20261002_hardening.sql`; then
-   `supabase functions deploy account-recovery --no-verify-jwt`.
-   `RESEND_API_KEY` is set; `majincheng.com` must be verified in Resend.
-   Try it: add a recovery address in the Account window, sign out, and
-   use "Forgot your password?".
+1. **Run `supabase/migrations/20261003_advisor.sql`** in the Supabase
+   SQL editor, then run Advisors › Security again. Expected leftovers:
+   - members can call `my_reactions`, `my_recovery_email`,
+     `set_recovery_email` and `chat_can_write`, on purpose;
+   - leaked password protection (an Auth setting on the Pro plan).
+
+   Password reset (20261001, 20261002 and the `account-recovery`
+   function) is live and sends mail.
 2. **Moderation** is in (2026-09-26): every new Stickies note and public
    chat message goes to the owner on Telegram with Hide / Show again;
    `/watch off` stops it. Automatic filtering in front of it is still an
@@ -354,7 +355,10 @@ ryOS (AGPL-3.0).
     - reset mail sent after the answer (no timing oracle);
     - chat signals tied to the sender's presence;
     - security headers;
-    - bounded inputs on `/api/*`.
+    - bounded inputs on `/api/*`;
+    - Security Advisor findings (20261003): trigger functions no longer
+      callable over the API, `username_available` runs as the caller,
+      and reactions check the post and the member.
     Known and accepted:
     - Presence names are the client's own claim (a signed-out visitor
       could show up as "jincheng" on a cursor or in AirDrop). Signals
@@ -367,7 +371,7 @@ ryOS (AGPL-3.0).
     - There's no full script CSP: Astro's inline hydration and the
       YouTube player would need it loosened too far to help.
     In the Supabase dashboard:
-    - run Advisors › Security;
+    - run Advisors › Security after each migration;
     - keep Settings › API › Exposed schemas to `public` (and
       `graphql_public` only if GraphQL is used; otherwise disable it);
     - consider CAPTCHA under Auth › Attack Protection if sign-up spam
