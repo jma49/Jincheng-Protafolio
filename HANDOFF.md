@@ -299,12 +299,13 @@ ryOS (AGPL-3.0).
 
 ## 3. Open issues and next steps
 
-1. **Password reset (2026-09-26): run
-   `supabase/migrations/20261001_password_reset.sql`, then
-   `supabase functions deploy account-recovery --no-verify-jwt`.**
-   `RESEND_API_KEY` is set and `majincheng.com` must be verified in
-   Resend. Then try it: add a recovery address in the Account window,
-   sign out, and use "Forgot your password?".
+1. **Run two migrations and deploy one function** (2026-09-26): in the
+   Supabase SQL editor run `supabase/migrations/20261001_password_reset.sql`
+   and then `20261002_hardening.sql`; then
+   `supabase functions deploy account-recovery --no-verify-jwt`.
+   `RESEND_API_KEY` is set; `majincheng.com` must be verified in Resend.
+   Try it: add a recovery address in the Account window, sign out, and
+   use "Forgot your password?".
 2. **Moderation** is in (2026-09-26): every new Stickies note and public
    chat message goes to the owner on Telegram with Hide / Show again;
    `/watch off` stops it. Automatic filtering in front of it is still an
@@ -319,9 +320,10 @@ ryOS (AGPL-3.0).
    songs show the listening view.
 4. **Tests and CI** are in: `npm test` (Vitest: Spider's rules, Pinball's
    physics by bot, the window manager, the Soapbox bot under a fake
-   Telegram and Supabase) and `npm run test:db` (27 database rules
-   against Postgres, with stand-ins for Supabase's auth, storage and
-   pg_net). `.github/workflows/ci.yml` runs both and the build on every
+   Telegram and Supabase, the account-recovery function) and
+   `npm run test:db` (about 50 database rules, plus races against the
+   per-member limits, on Postgres with stand-ins for Supabase's auth,
+   storage and pg_net). `.github/workflows/ci.yml` runs both and the build on every
    pull request. **Possible next work:** the Chinese site and the AI assistant later;
    an ocra review-replay app once ocra's redesign is done.
 5. **Still missing compared with ryOS:** in Chat, @ryo (AI replies), voice
@@ -343,3 +345,30 @@ ryOS (AGPL-3.0).
     loaded chunk; all desktop pictures are WebP ≤ 2560px. Not done, on
     purpose: a focus trap in windows (they aren't modal); a "continue
     playing" prompt for hidden tabs; more reduced-motion fallbacks.
+7. **Security review (2026-09-26).** Fixed:
+    - the per-member limits (notes, chat, reset links) let simultaneous
+      requests through; they now take advisory locks, and race.sh proves
+      it;
+    - site-wide caps on chat, sign-ups and reset mail;
+    - an index for the chat limit;
+    - reset mail sent after the answer (no timing oracle);
+    - chat signals tied to the sender's presence;
+    - security headers;
+    - bounded inputs on `/api/*`.
+    Known and accepted:
+    - Presence names are the client's own claim (a signed-out visitor
+      could show up as "jincheng" on a cursor or in AirDrop). Signals
+      only carry names and Macintosh HD paths. Proper identity would
+      need Realtime Authorization and server-checked presence.
+    - Astro 5 and sharp have advisories, fixed only in Astro 7. They
+      concern server rendering, `define:vars`, server islands and image
+      decoding of untrusted files, none of which this static site uses.
+      Upgrade when there's time for a major migration.
+    - There's no full script CSP: Astro's inline hydration and the
+      YouTube player would need it loosened too far to help.
+    In the Supabase dashboard:
+    - run Advisors › Security;
+    - keep Settings › API › Exposed schemas to `public` (and
+      `graphql_public` only if GraphQL is used; otherwise disable it);
+    - consider CAPTCHA under Auth › Attack Protection if sign-up spam
+      appears (it needs a widget in the Account window).
