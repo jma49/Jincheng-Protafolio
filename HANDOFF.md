@@ -159,6 +159,11 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   `cowsay`, `fortune`, `uptime`, `say`.
 - **Dock menus:** right-click an app for its windows, Show in Finder,
   Hide and Quit.
+- **Games** (Applet Store): Spider Solitaire (one, two or four suits,
+  undo, hints) and Pinball, an original Space Cadet–style table (bumpers,
+  slingshots, drop targets, lanes, a wormhole, ranks Cadet → Fleet
+  Admiral) with its own physics, played headlessly by bots to check the
+  ball can't escape or get stuck.
 - **Finder:** Macintosh HD opens a Finder over Applications, Applets,
   Documents, Music (albums as folders; a song plays on the iPod),
   Pictures and Projects, with icon, list (sortable headers) and column
@@ -259,6 +264,14 @@ ryOS (AGPL-3.0).
   bypass to see (and the reduced-motion fallback checked separately).
 
 ### Decisions
+
+- **The King of Fighters '98** (looked into 2026-09-26): a Neo Geo
+  emulator runs well in the browser (EmulatorJS with the FBNeo core,
+  WebAssembly), but the game ROM and the Neo Geo BIOS are SNK's, so the
+  site can't host them. The only lawful way is "bring your own ROM": the
+  visitor picks their own kof98.zip and neogeo.zip, which stay in their
+  browser. Not built; it would be an applet loading the emulator from
+  its CDN (GPL), with keyboard and gamepad controls.
 
 - No link back to a classic site; Chinese is on hold.
 - Don't change ocra for now; it will be redesigned.
