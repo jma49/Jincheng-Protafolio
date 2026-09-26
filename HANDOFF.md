@@ -146,6 +146,18 @@ session. Conventions and code layout are in [AGENTS.md](AGENTS.md).
   what's next). The library (`src/data/songs.json`) has 15 songs and
   Ryuichi Sakamoto's BTTB -20th Anniversary Edition- (18 tracks);
   lyrics come from lrclib.net, or NetEase via `/api/lyrics`.
+- **Photo Booth:** the camera in a mirror with nine effects, a 3-2-1
+  countdown and flash, one picture or four; pictures stay in the
+  browser and can be downloaded or made the desktop picture.
+- **Synth** (applet): two octaves played with the mouse or Musical
+  Typing, presets, waveforms, attack/release, tone, echo and an
+  oscilloscope.
+- **About This Mac** (Apple menu): the visitor's browser as the
+  "hardware", and the build's commit under Software Update….
+- **Terminal** extras: `cd`/`pwd`/`ls`/`cat`/`open` over Macintosh HD,
+  `cowsay`, `fortune`, `uptime`, `say`.
+- **Dock menus:** right-click an app for its windows, Show in Finder,
+  Hide and Quit.
 - **Finder:** Macintosh HD opens a Finder over Applications, Applets,
   Documents, Music (albums as folders; a song plays on the iPod),
   Pictures and Projects, with icon, list (sortable headers) and column
